@@ -1,0 +1,5 @@
+#!/bin/sh
+rm -rf /usr/local/logstash/data/plugins/inputs/file/.sinced*
+rm *_login
+#/usr/local/logstash/bin/logstash --log.level debug -f test.conf
+/usr/local/logstash/bin/logstash -f game1.conf.back -w 8
