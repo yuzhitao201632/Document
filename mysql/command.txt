@@ -1,0 +1,38 @@
+增加访问远程访问权限控制
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'119.29.104.226' IDENTIFIED BY 'zulong226' WITH GRANT OPTION;            
+Query OK, 0 rows affected (0.00 sec)
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+
+创建表格
+create table task_flow(sn int AUTO_INCREMENT not null primary key, log_time timestamp not null, roleid bigint not null, level int not null, task_id int not null, action varchar(15) not null);
+
+
+移动表格
+RENAME TABLE db_a.old_table TO db_b.new_table;
+
+
+复制表格
+CREATE TABLE new SELECT * FROM dbname.old;
+
+
+重命名表格
+RENAME TABLE old_table TO new_table;
+
+清空表格
+delete from table_name;
+
+
+复制库
+#mysql
+ -u root -ppassword
+mysql>CREATE
+ DATABASE `newdb` DEFAULT CHARACTER SET UTF8 COLLATE UTF8_GENERAL_CI;
+#mysqldump
+ db1 -u root -ppassword --add-drop-table | mysql newdb -u root -ppassword
+
+
+MySQL如何处理数组需求的字段
+转为json格式的字符串类型，存在text里面
+
