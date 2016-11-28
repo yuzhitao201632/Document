@@ -15,6 +15,7 @@ RENAME TABLE db_a.old_table TO db_b.new_table;
 
 复制表格
 CREATE TABLE new SELECT * FROM dbname.old;
+create table server_1004.role_base like server_1002.role_base;
 
 
 重命名表格
@@ -23,6 +24,20 @@ RENAME TABLE old_table TO new_table;
 清空表格
 delete from table_name;
 
+修改表格列类型
+alter table role_base modify nation tinyint;
+
+表格添加列
+alter table role_base add nation int not null;
+
+更新表格
+update role_base set zone = 1002;
+
+抽取两列按序排列
+select roleid, level from flow_levelup order by roleid, level asc;
+
+条件性复制部分数据
+insert into role_status_tmp select * from role_status_1 where id < 1000000;
 
 复制库
 #mysql
@@ -32,7 +47,52 @@ mysql>CREATE
 #mysqldump
  db1 -u root -ppassword --add-drop-table | mysql newdb -u root -ppassword
 
+分组
+create table t_tmp select roleid, max(level) as max_level from flow_levelup group by roleid;
+
+根据某列，更新另一列数据
+update student s set city_name = (select name from city where code = s.city_code);
+
 
 MySQL如何处理数组需求的字段
 转为json格式的字符串类型，存在text里面
 
+根据一个表，更新另一个表
+mysql> insert into role_base values(123,'',1,1,1,NULL);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from role_base;
++-----+------+--------+------------+------+---------------------+
+| id  | name | gender | profession | zone | create_time         |
++-----+------+--------+------------+------+---------------------+
+| 123 |      |      1 |          1 |    1 | 2016-11-25 18:18:25 |
++-----+------+--------+------------+------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> update role_base s set create_time = (select log_time from flow_createrole where roleid = s.id order by log_time desc limit 1);       
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from role_base;
++-----+------+--------+------------+------+---------------------+
+| id  | name | gender | profession | zone | create_time         |
++-----+------+--------+------------+------+---------------------+
+| 123 |      |      1 |          1 |    1 | 2016-11-11 11:11:13 |
++-----+------+--------+------------+------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> update role_base s set create_time = (select log_time from flow_createrole where roleid = s.id order by log_time limit 1);     
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from role_base;
++-----+------+--------+------------+------+---------------------+
+| id  | name | gender | profession | zone | create_time         |
++-----+------+--------+------------+------+---------------------+
+| 123 |      |      1 |          1 |    1 | 2016-11-11 11:11:11 |
++-----+------+--------+------------+------+---------------------+
+1 row in set (0.00 sec)
+
+
+replace into role_base(id,profession,create_time) select distinct roleid, profession,log_time from flow_createrole;
+replace into role_base(id, name, gender, profession, zone, create_time) select roleid, NULL, NULL, NULL, 1004, log_time from flow_createrole;
